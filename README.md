@@ -6,7 +6,13 @@ Full six-question write-up is in [`CASE_STUDY.md`](./CASE_STUDY.md) if you want 
 
 ## The project
 
-Our team built an [Intruder Detection Robot](./original-deck.pdf) for our IoT module: Arduino Uno, a servo-swept ultrasonic sensor, GPS, a buzzer, and two separate alert paths (Bluetooth app + a Google Sheet). It worked, in the demo-day sense. It also had three real problems, and we know exactly what they were because we measured them ourselves:
+Our team built an [Intruder Detection Robot](./original-deck.pdf) for our IoT module. It worked, in the demo-day sense. It also had three real problems, and we know exactly what they were because we measured them ourselves.
+
+### What it actually does
+
+It's a small IoT security device built around an Arduino Uno. An ultrasonic sensor sits on a servo, sweeping back and forth to check for anything entering the monitored area. When something gets close enough, it sounds a local buzzer and LED, and sends an alert two separate ways: a Bluetooth push to a paired phone app, and a log entry in a Google Sheet over WiFi. A DHT11 temp/humidity sensor corrects the distance readings for the actual speed of sound in the room, and a sound sensor and GPS module were along for the ride as secondary inputs.
+
+### What broke
 
 - **Servo brownout.** Wire up 3 servos and only one runs. Wire up 2 and they stutter. The team's own finding: a servo needs 4.8-6V, and the shared 5V rail couldn't feed more than one at a time.
 - **A GPS module that was basically decorative.** Needed a clear outdoor sky view and several minutes to get a fix. On an indoor security node.
