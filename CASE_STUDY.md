@@ -12,6 +12,8 @@ See [`README.md`](./README.md) for the short version with runnable proof. This i
 
 The Intruder Detection Robot was an Arduino Uno R3-based system built to monitor a fixed area, detect unauthorized presence, and alert a user. Per our own project brief, it was meant to send an update when an intruder is detected, detect unwanted objects, trigger alerts on intrusion, protect expensive items, and guard restricted areas.
 
+In plain terms: an ultrasonic sensor sat on a servo, sweeping back and forth to check for anything entering the monitored area. When something got close enough, it sounded a local buzzer and LED, and sent an alert two separate ways, a Bluetooth push to a paired phone app, and a log entry in a Google Sheet over WiFi. A DHT11 temp/humidity sensor corrected the distance readings for the actual speed of sound in the room, and a sound sensor and GPS module were along for the ride as secondary inputs. The table below breaks down what each component was responsible for.
+
 | Component | Role |
 |---|---|
 | Arduino Uno R3 | Mainboard |
