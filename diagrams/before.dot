@@ -1,0 +1,53 @@
+digraph before {
+    rankdir=LR;
+    graph [fontname="Helvetica", bgcolor="white", pad=0.4, nodesep=0.35, ranksep=0.6];
+    node [fontname="Helvetica", fontsize=11, style="filled,rounded", shape=box, penwidth=1.2];
+    edge [fontname="Helvetica", fontsize=9, color="#555555"];
+
+    subgraph cluster_power {
+        label="Power (single point of failure)";
+        style="dashed"; color="#b00020"; fontcolor="#b00020"; fontsize=11;
+        USB [label="USB from laptop\n(tethered, not deployable)", fillcolor="#fbe1e1", color="#b00020"];
+    }
+
+    subgraph cluster_mcu {
+        label="Arduino Uno R3 (single 5V logic rail)";
+        style="rounded"; color="#1f3a5f"; fontsize=11;
+        MCU [label="Arduino Uno R3", fillcolor="#dce8f7", color="#1f3a5f"];
+    }
+
+    subgraph cluster_actuation {
+        label="Actuation (undersized power \u2192 brownout)";
+        style="dashed"; color="#b00020"; fontcolor="#b00020"; fontsize=11;
+        SERVO [label="3x SG90 servos\ndriven directly off 5V rail\n(only 1 runs cleanly at a time)", fillcolor="#fbe1e1", color="#b00020"];
+        BUZZ [label="Active buzzer + LED", fillcolor="#eef2f8"];
+    }
+
+    subgraph cluster_sense {
+        label="Sensing (single-threshold logic)";
+        style="rounded"; color="#1f3a5f"; fontsize=11;
+        SONAR [label="HC-SR04 ultrasonic\non servo sweep", fillcolor="#eef2f8"];
+        DHT [label="DHT11 temp/humidity\n(sound-speed correction)", fillcolor="#eef2f8"];
+        SOUND [label="Sound sensor", fillcolor="#eef2f8"];
+        GPS [label="GPS GY-NEO6M\n(needs outdoor sky view,\nmin. of no value indoors)", fillcolor="#fbe1e1", color="#b00020"];
+    }
+
+    subgraph cluster_comms {
+        label="Two disconnected, unauthenticated alert paths";
+        style="dashed"; color="#b00020"; fontcolor="#b00020"; fontsize=11;
+        BLE [label="Bluetooth module", fillcolor="#eef2f8"];
+        PHONE [label="Paired phone app\n(local BLE range only)", fillcolor="#f5f5f5"];
+        WIFI [label="WiFi \u2192 Google Apps\nScript webhook\n(unauthenticated)", fillcolor="#eef2f8"];
+        SHEET [label="Google Sheet log", fillcolor="#f5f5f5"];
+    }
+
+    USB -> MCU [label="powers"];
+    MCU -> SERVO;
+    MCU -> BUZZ;
+    SONAR -> MCU;
+    DHT -> MCU;
+    SOUND -> MCU;
+    GPS -> MCU;
+    MCU -> BLE -> PHONE;
+    MCU -> WIFI -> SHEET;
+}

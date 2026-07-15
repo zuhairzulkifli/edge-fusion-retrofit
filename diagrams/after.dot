@@ -1,0 +1,63 @@
+digraph after {
+    rankdir=LR;
+    graph [fontname="Helvetica", bgcolor="white", pad=0.4, nodesep=0.35, ranksep=0.6];
+    node [fontname="Helvetica", fontsize=11, style="filled,rounded", shape=box, penwidth=1.2];
+    edge [fontname="Helvetica", fontsize=9, color="#555555"];
+
+    subgraph cluster_power {
+        label="Power (standalone, isolated rails)";
+        style="rounded"; color="#0b6e4f"; fontsize=11;
+        BATT [label="LiPo + TP4056 charger", fillcolor="#e1f5ec", color="#0b6e4f"];
+        BUCK1 [label="Buck reg. \u2192 3.3V/5V logic rail", fillcolor="#e1f5ec"];
+        BUCK2 [label="Dedicated 5V/3A rail\n\u2192 actuation only", fillcolor="#e1f5ec"];
+    }
+
+    subgraph cluster_mcu {
+        label="ESP32 (dual-core, WiFi+BLE, PWM headroom)";
+        style="rounded"; color="#1f3a5f"; fontsize=11;
+        MCU [label="ESP32", fillcolor="#dce8f7", color="#1f3a5f"];
+        FUSION [label="On-device fusion +\nconfidence scorer\n(context-aware, explainable)", fillcolor="#dce8f7"];
+    }
+
+    subgraph cluster_actuation {
+        label="Actuation, decoupled from logic power";
+        style="rounded"; color="#0b6e4f"; fontsize=11;
+        PCA [label="PCA9685 I2C PWM driver", fillcolor="#e1f5ec", color="#0b6e4f"];
+        SERVO [label="Servos (all run cleanly\n\u2014 root cause fixed)", fillcolor="#e1f5ec"];
+        BUZZ [label="Buzzer + LED", fillcolor="#eef2f8"];
+    }
+
+    subgraph cluster_sense {
+        label="Sensing (fixed fan + motion pre-trigger, GPS removed)";
+        style="rounded"; color="#1f3a5f"; fontsize=11;
+        SONAR3 [label="3x HC-SR04\nfixed-angle fan\n(no mechanical sweep lag)", fillcolor="#eef2f8"];
+        PIR [label="PIR motion\n(fast pre-trigger)", fillcolor="#eef2f8"];
+        DHT [label="DHT temp/humidity", fillcolor="#eef2f8"];
+        SOUND [label="Sound sensor", fillcolor="#eef2f8"];
+    }
+
+    subgraph cluster_comms {
+        label="Unified, authenticated backbone";
+        style="rounded"; color="#0b6e4f"; fontsize=11;
+        MQTT [label="MQTT client (TLS)", fillcolor="#e1f5ec", color="#0b6e4f"];
+        BROKER [label="MQTT broker\n(cloud)", fillcolor="#f5f5f5"];
+        AGENT [label="AI triage agent\n(summarize + prioritize)", fillcolor="#fff4d6", color="#8a6d00"];
+        PUSH [label="Push notification\n(phone app)", fillcolor="#f5f5f5"];
+        STORE [label="Event store\n(replaces raw Sheet log)", fillcolor="#f5f5f5"];
+    }
+
+    BATT -> BUCK1; BATT -> BUCK2;
+    BUCK1 -> MCU [label="powers"];
+    BUCK2 -> PCA [label="powers"];
+    PCA -> SERVO;
+    MCU -> BUZZ;
+    MCU -> PCA [label="I2C"];
+    SONAR3 -> FUSION;
+    PIR -> FUSION;
+    DHT -> FUSION;
+    SOUND -> FUSION;
+    FUSION -> MCU;
+    MCU -> MQTT -> BROKER;
+    BROKER -> STORE;
+    BROKER -> AGENT -> PUSH;
+}
